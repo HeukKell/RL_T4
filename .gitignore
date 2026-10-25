@@ -1,0 +1,65 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Python environments and packaging
+.venv/
+venv/
+env/
+ENV/
+__pypackages__/
+build/
+dist/
+wheels/
+*.egg-info/
+.eggs/
+*.egg
+
+# Python test and coverage output
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+
+# Unreal generated files (including plugins)
+RL_T4_UE/**/Binaries/
+RL_T4_UE/**/Intermediate/
+RL_T4_UE/**/Saved/
+RL_T4_UE/**/DerivedDataCache/
+RL_T4_UE/.vs/
+RL_T4_UE/.idea/
+RL_T4_UE/*.sln
+RL_T4_UE/*.slnx
+RL_T4_UE/*.suo
+RL_T4_UE/*.opensdf
+RL_T4_UE/*.sdf
+RL_T4_UE/*.VC.db
+RL_T4_UE/*.VC.opendb
+RL_T4_UE/*.VC.db-shm
+RL_T4_UE/*.VC.db-wal
+*.VC.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Local editor, environment and OS files
+.idea/
+*.swp
+*.swo
+*~
+.env
+.env.*
+!.env.example
+!.env.sample
+.DS_Store
+Thumbs.db
+Desktop.ini

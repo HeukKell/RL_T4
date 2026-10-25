@@ -1,0 +1,2 @@
+# Store every Unreal Content file in Git LFS.
+RL_T4_UE/Content/** filter=lfs diff=lfs merge=lfs -text
