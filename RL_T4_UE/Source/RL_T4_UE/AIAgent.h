@@ -12,18 +12,41 @@
 
 struct FSharedMemoryType
 {
+	// 0:4
 	uint32 IsTraining;
 	
+	// 4:8
 	uint32 State;
+
+	// 8:12
 	uint32 NextState;
+
+	// 12:16
 	uint32 Action;
+
+	// 16:20
 	float Reward;
 	
+	// 20:24
 	uint32 IsBrainRunning;
+
+	// 24:28
 	uint32 IsStateSetted;
+
+	// 28:32
 	uint32 IsActionSetted;
+
+	// 32:36
 	uint32 IsRewardSetted;
+
+	// 36:40
 	uint32 IsTrained;
+
+	// 40:44
+	uint32 danger;
+
+	// 44:48
+	uint32 goal;
 };
 
 class AAIAgent;

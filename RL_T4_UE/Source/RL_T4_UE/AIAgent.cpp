@@ -4,6 +4,11 @@
 #include "AIAgent.h"
 #include "PlayBoard.h"
 
+#include "Async/Async.h"
+#include "Windows/WindowsHWrapper.h"
+
+#define TEST_1	// 임시 테스트 모드 활성화
+
 FAIModelConnector::FAIModelConnector()
 {
 }
@@ -29,7 +34,62 @@ uint32 FAIModelConnector::Run()
 
 	CurrentEpisode = 0;
 	CurrentStep = 0;
-	
+
+	// 공유메모리 생성
+	HANDLE SharedMemory_Handle = CreateFileMappingW(
+		INVALID_HANDLE_VALUE,
+		nullptr,
+		PAGE_READWRITE,
+		0,
+		sizeof(FSharedMemoryType),
+		L"Local\\AgentMemory"
+	);
+
+	if (nullptr == SharedMemory_Handle) {
+		int32 ErrorNo = int32(GetLastError());
+		
+		if (ErrorNo == ERROR_ALREADY_EXISTS) {
+			UE_LOG(LogTemp, Log, TEXT("CreateFileMappingW already exist error :  %d"), ErrorNo);
+			// 문제없으므로 계속해서 진행
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("CreateFileMappingW Error (%d)"), ErrorNo);
+			CloseHandle(SharedMemory_Handle);
+			return 1;
+		}
+	}
+
+	void* SharedMemory_Addr = MapViewOfFile(
+		SharedMemory_Handle,
+		FILE_MAP_ALL_ACCESS,
+		0, 0,
+		sizeof(FSharedMemoryType)
+	);
+
+	if (SharedMemory_Addr == nullptr) {
+		int32 ErrorNo = int32(GetLastError());
+		UE_LOG(LogTemp, Warning, TEXT("MapViewOfFile is Failed. %d"), ErrorNo);
+		UnmapViewOfFile(SharedMemory_Addr);
+		CloseHandle(SharedMemory_Handle);
+	}
+
+	FSharedMemoryType* SharedMemory = static_cast<FSharedMemoryType*>(SharedMemory_Addr);
+
+
+#ifdef TEST_1
+
+#else 
+	// 이벤트 생성
+
+	HANDLE QuitTrainEvent = CreateEventW(nullptr, false, false, L"Local\\QuitTrainEvent");
+
+	auto CloseEvent = [QuitTrainEvent]() {	
+		CloseHandle(QuitTrainEvent);
+	};
+
+#endif
+
+
 	if (!(MaxEpisode > CurrentEpisode && MaxStep > CurrentEpisode))
 	{
 		UE_LOG(LogTemp, Log, TEXT("FAIModelConnector::Run >> Episode or Step is not setted correctly"));
@@ -49,9 +109,20 @@ uint32 FAIModelConnector::Run()
 				}
 				
 				CurrentStep = j;
+
+#ifdef TEST_1
+
 				UE_LOG(LogTemp, Log, TEXT("FAIModelConnector::Run >> Episode : %d/%d , Step : %d/%d "), CurrentEpisode, MaxEpisode, CurrentStep, MaxStep);
+				SharedMemory->IsTraining = j;
 				FPlatformProcess::Sleep(1);
+
+#else
+
+				// 실제로직
+#endif
+
 			}
+
 			
 			if (bStopRequested)
 			{
@@ -59,9 +130,20 @@ uint32 FAIModelConnector::Run()
 			}
 		}
 	}
-	
+
+
+#ifdef TEST_1
+
+#else
+	SetEvent(QuitTrainEvent);
+
+	CloseEvent();
+#endif
+
+
+
 	UE_LOG(LogTemp, Log, TEXT("FAIModelConnector::Run >> End"));
-	
+
 	return 0;
 }
 
